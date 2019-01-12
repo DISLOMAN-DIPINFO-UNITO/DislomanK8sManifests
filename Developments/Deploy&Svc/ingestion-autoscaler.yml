@@ -1,0 +1,17 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ingestion-autoscaler
+  namespace: disloman
+  labels:
+    app: disloman
+    name: ingestion-autoscaler
+    type: autoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1beta1
+    kind: Deployment
+    name: ingestion-microservice
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPUUtilizationPercentage: 80

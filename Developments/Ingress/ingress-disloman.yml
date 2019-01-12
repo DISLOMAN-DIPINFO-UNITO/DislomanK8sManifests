@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-disloman
+  namespace: disloman
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - disloman
+    secretName: disloman-ingress-tls
+  rules:
+    - host: disloman
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: gateway
+              servicePort: web
+#          - path: /kafkaManager
+#            backend:
+#              serviceName: kafka-manager
+#              servicePort: 80
+#          - path: /mongoExpress
+#            backend:
+#              serviceName: mongo-express
+#              servicePort: 8081

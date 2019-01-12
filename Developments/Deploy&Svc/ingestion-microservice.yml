@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingestion
+  namespace: disloman
+  labels:
+    app: disloman
+    name: ingestion
+spec:
+  ports:
+  - protocol: TCP
+    # Gli altri Pods del cluster per comunicare con questo Servizio (e relativi Pods che gli stanno dietro) possono quindi utilizzare il DNS NAME: ingestion e PORT NUMER:8080
+    port: 8080
+  selector:
+    app: ingestion
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingestion-microservice
+  namespace: disloman
+  labels:
+    app: disloman
+    name: ingestion
+    version: 1.0.0-SNAPSHOT
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingestion
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # Il Rolling Update avverrà tirando giù un Pod alla volta
+      maxUnavailable: 1
+      # Il Rolling Update avverrà senza avere più di 1 extra Pod esistente rispetto a quelli complessivi stabiliti da replicas
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: ingestion
+    spec:
+      containers:
+      - name: ingestion-service
+        image: drugotosto84/ingestion-service:1.0.0-SNAPSHOT
+        imagePullPolicy: Always
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "kub"
+        # Lista delle porte che il dato container espone e che sono quindi accoppiate con quelle definite all'interno del suo Dockerfile (non è necesseria definirla). Sulla data porta ci sarà in ascolto una determinata applicazione
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 120
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8080
+          initialDelaySeconds: 120
+          timeoutSeconds: 30
+

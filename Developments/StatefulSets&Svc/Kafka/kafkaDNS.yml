@@ -1,0 +1,17 @@
+# A headless service to create DNS records
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafkadns
+  namespace: disloman
+  labels:
+      app: disloman
+      name: kafka
+spec:
+  ports:
+  - port: 9092
+  # kafka-<num>.kafkadns disloman.svc.cluster.local
+  clusterIP: None
+  selector:
+    app: kafka
