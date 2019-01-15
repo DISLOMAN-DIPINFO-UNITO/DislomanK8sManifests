@@ -44,7 +44,7 @@ spec:
       containers:
       - name: ingestion-service
         image: marcoscaletta/ingestion-service:1.0.0-SNAPSHOT
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: "kub"
